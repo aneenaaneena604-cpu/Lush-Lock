@@ -695,192 +695,302 @@
   </footer>
 
   <script>
-    (function() {
-      // ----- TOGGLE functionality -----
-      const toggleBtn = document.getElementById('navToggle');
-      const navbarRight = document.getElementById('navbarRight');
+   (function () {
 
-      if (toggleBtn && navbarRight) {
-        toggleBtn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          navbarRight.classList.toggle('open');
-          const icon = toggleBtn.querySelector('i');
-          icon.className = navbarRight.classList.contains('open') ? 'fas fa-times' : 'fas fa-bars';
-        });
+  // ===========================
+  // Navbar Toggle
+  // ===========================
+  const toggleBtn = document.getElementById("navToggle");
+  const navbarRight = document.getElementById("navbarRight");
 
-        // close on outside click
-        document.addEventListener('click', function(e) {
-          const isInside = navbarRight.contains(e.target) || toggleBtn.contains(e.target);
-          if (!isInside && navbarRight.classList.contains('open')) {
-            navbarRight.classList.remove('open');
-            toggleBtn.querySelector('i').className = 'fas fa-bars';
-          }
-        });
+  if (toggleBtn && navbarRight) {
 
-        // close on Escape
-        document.addEventListener('keydown', function(e) {
-          if (e.key === 'Escape' && navbarRight.classList.contains('open')) {
-            navbarRight.classList.remove('open');
-            toggleBtn.querySelector('i').className = 'fas fa-bars';
-          }
-        });
+    toggleBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+
+      navbarRight.classList.toggle("open");
+
+      toggleBtn.querySelector("i").className =
+        navbarRight.classList.contains("open")
+          ? "fas fa-times"
+          : "fas fa-bars";
+    });
+
+    document.addEventListener("click", function (e) {
+
+      if (
+        !navbarRight.contains(e.target) &&
+        !toggleBtn.contains(e.target)
+      ) {
+
+        navbarRight.classList.remove("open");
+        toggleBtn.querySelector("i").className = "fas fa-bars";
       }
 
-      // ----- CART FUNCTIONS -----
-      function getCart() {
-        return JSON.parse(localStorage.getItem('cart')) || [];
+    });
+
+    document.addEventListener("keydown", function (e) {
+
+      if (e.key === "Escape") {
+
+        navbarRight.classList.remove("open");
+        toggleBtn.querySelector("i").className = "fas fa-bars";
+
       }
 
-      function setCart(cart) {
-        localStorage.setItem('cart', JSON.stringify(cart));
-        updateCartCount();
-        displayCart();
-      }
+    });
 
-      function updateCartCount() {
-        const cart = getCart();
-        const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-        const badge = document.getElementById('cartCount');
-        if (badge) badge.textContent = total;
-      }
+  }
 
-      // display cart
-      window.displayCart = function() {
-        const cart = getCart();
-        const container = document.getElementById('cartContainer');
-        const summary = document.getElementById('cartSummary');
 
-        if (cart.length === 0) {
-          container.innerHTML = `
-            <div class="empty">
-              <i class="fas fa-shopping-bag"></i><br><br>
-              Your cart is empty 🛒<br><br>
-              <a href="index.html">Continue Shopping</a>
-            </div>
-          `;
-          summary.innerHTML = '';
-          return;
-        }
+  // ===========================
+  // CART
+  // ===========================
 
-        let html = '';
-        let total = 0;
+  function getCart() {
+    return JSON.parse(localStorage.getItem("cart")) || [];
+  }
 
-        cart.forEach((product, index) => {
-          const itemTotal = product.price * product.quantity;
-          total += itemTotal;
-          const img = product.image || 'https://placehold.co/100x120/e8e0d8/3a5a3a?text=✨';
-          html += `
-            <div class="cart-item">
-              <img src="${img}" alt="${product.name}" loading="lazy" />
-              <div class="product-info">
-                <h3>${product.name}</h3>
-                <div class="price">₹${product.price}</div>
-                <div class="quantity">
-                  <button onclick="decreaseQuantity(${index})">−</button>
-                  <span>${product.quantity}</span>
-                  <button onclick="increaseQuantity(${index})">+</button>
-                </div>
-              </div>
-              <div class="item-total"><strong>₹${itemTotal}</strong></div>
-              <button class="remove" onclick="removeCart(${index})"><i class="fas fa-trash"></i></button>
-            </div>
-          `;
-        });
+  function saveCart(cart) {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }
 
-        container.innerHTML = html;
-        summary.innerHTML = `
-          <h2>Total: ₹${total}</h2>
-          <button class="checkout" onclick="checkout()">Proceed to Checkout</button>
-        `;
-      };
+  function updateCartCount() {
 
-      // quantity controls
-      window.increaseQuantity = function(index) {
-        const cart = getCart();
-        if (cart[index]) {
-          cart[index].quantity += 1;
-          setCart(cart);
-        }
-      };
+    const cart = getCart();
 
-      window.decreaseQuantity = function(index) {
-        const cart = getCart();
-        if (!cart[index]) return;
-        if (cart[index].quantity > 1) {
-          cart[index].quantity -= 1;
-        } else {
-          cart.splice(index, 1);
-        }
-        setCart(cart);
-      };
+    const total = cart.reduce((sum, item) => {
+      return sum + (item.quantity || 1);
+    }, 0);
 
-      window.removeCart = function(index) {
-        const cart = getCart();
-        cart.splice(index, 1);
-        setCart(cart);
-      };
+    const badge = document.getElementById("cartCount");
 
-      // checkout modal
-      window.checkout = function() {
-        const cart = getCart();
-        if (cart.length === 0) {
-          alert('Your cart is empty!');
-          return;
-        }
-        document.getElementById('checkoutModal').style.display = 'flex';
-      };
+    if (badge) badge.innerHTML = total;
 
-      window.closeCheckout = function() {
-        document.getElementById('checkoutModal').style.display = 'none';
-      };
+  }
 
-      window.submitOrder = function(event) {
-        event.preventDefault();
-        const name = document.getElementById('customerName').value;
-        const payment = document.getElementById('payment').value;
-        const cart = getCart();
 
-        if (cart.length === 0) {
-          alert('Your cart is empty!');
-          return;
-        }
+  // ===========================
+  // Display Cart
+  // ===========================
 
-        localStorage.removeItem('cart');
-        alert(`Order placed successfully! 🎉\n\nThank you, ${name} ❤️\n\nPayment: ${payment}`);
-        closeCheckout();
-        document.getElementById('checkoutForm').reset();
-        setCart([]);
-        displayCart();
-        updateCartCount();
-      };
+  function displayCart() {
 
-      // ----- seed data if empty -----
-      function seedCart() {
-        let cart = getCart();
-        if (cart.length === 0) {
-          const sample = [
-            { name: 'Coconut Oil Serum', price: 349, quantity: 1, image: 'https://placehold.co/100x120/e8e0d8/3a5a3a?text=🌴' },
-            { name: 'Argan Shampoo', price: 499, quantity: 2, image: 'https://placehold.co/100x120/e8e0d8/3a5a3a?text=🧴' },
-            { name: 'Aloe Vera Mask', price: 279, quantity: 1, image: 'https://placehold.co/100x120/e8e0d8/3a5a3a?text=🌿' }
-          ];
-          localStorage.setItem('cart', JSON.stringify(sample));
-        }
-      }
+    const cart = getCart();
 
-      // ----- init -----
-      seedCart();
+    const container = document.getElementById("cartContainer");
+    const summary = document.getElementById("cartSummary");
+
+    if (!container) return;
+
+    if (cart.length === 0) {
+
+      container.innerHTML = `
+      <div class="empty">
+        <i class="fas fa-shopping-cart"></i>
+        <h2>Your Cart is Empty</h2>
+        <p>Add products to your cart.</p>
+        <a href="index.html">Continue Shopping</a>
+      </div>
+      `;
+
+      if (summary) summary.innerHTML = "";
+
       updateCartCount();
-      displayCart();
 
-      // sync across tabs
-      window.addEventListener('storage', function(e) {
-        if (e.key === 'cart') {
-          updateCartCount();
-          displayCart();
-        }
-      });
+      return;
 
-    })();
+    }
+
+    let html = "";
+    let total = 0;
+
+    cart.forEach((product, index) => {
+
+      const quantity = product.quantity || 1;
+
+      const itemTotal = Number(product.price) * quantity;
+
+      total += itemTotal;
+
+      html += `
+
+      <div class="cart-item">
+
+        <img src="${product.image}" alt="${product.name}">
+
+        <div class="product-info">
+
+            <h3>${product.name}</h3>
+
+            <div class="price">₹${product.price}</div>
+
+            <div class="quantity">
+
+                <button onclick="decreaseQuantity(${index})">-</button>
+
+                <span>${quantity}</span>
+
+                <button onclick="increaseQuantity(${index})">+</button>
+
+            </div>
+
+        </div>
+
+        <div class="item-total">
+            ₹${itemTotal}
+        </div>
+
+        <button class="remove" onclick="removeCart(${index})">
+            <i class="fas fa-trash"></i>
+        </button>
+
+      </div>
+
+      `;
+
+    });
+
+    container.innerHTML = html;
+
+    if (summary) {
+
+      summary.innerHTML = `
+        <h2>Total : ₹${total}</h2>
+        <button class="checkout" onclick="checkout()">
+          Proceed to Checkout
+        </button>
+      `;
+
+    }
+
+    updateCartCount();
+
+  }
+
+
+  // ===========================
+  // Quantity
+  // ===========================
+
+  window.increaseQuantity = function (index) {
+
+    let cart = getCart();
+
+    cart[index].quantity++;
+
+    saveCart(cart);
+
+    displayCart();
+
+  };
+
+
+
+  window.decreaseQuantity = function (index) {
+
+    let cart = getCart();
+
+    if (cart[index].quantity > 1) {
+
+      cart[index].quantity--;
+
+    } else {
+
+      cart.splice(index, 1);
+
+    }
+
+    saveCart(cart);
+
+    displayCart();
+
+  };
+
+
+
+  window.removeCart = function (index) {
+
+    let cart = getCart();
+
+    cart.splice(index, 1);
+
+    saveCart(cart);
+
+    displayCart();
+
+  };
+
+
+  // ===========================
+  // Checkout
+  // ===========================
+
+  window.checkout = function () {
+
+    if (getCart().length === 0) {
+
+      alert("Your cart is empty!");
+
+      return;
+
+    }
+
+    document.getElementById("checkoutModal").style.display = "flex";
+
+  };
+
+
+  window.closeCheckout = function () {
+
+    document.getElementById("checkoutModal").style.display = "none";
+
+  };
+
+
+  window.submitOrder = function (event) {
+
+    event.preventDefault();
+
+    const name = document.getElementById("customerName").value;
+
+    const payment = document.getElementById("payment").value;
+
+    alert(
+      `Order placed successfully!\n\nThank You ${name}\nPayment : ${payment}`
+    );
+
+    localStorage.removeItem("cart");
+
+    closeCheckout();
+
+    displayCart();
+
+  };
+
+
+  // ===========================
+  // Page Load
+  // ===========================
+
+  document.addEventListener("DOMContentLoaded", function () {
+
+    updateCartCount();
+
+    displayCart();
+
+  });
+
+
+  window.addEventListener("storage", function () {
+
+    updateCartCount();
+
+    displayCart();
+
+  });
+
+})();
   </script>
 </body>
 </html>
