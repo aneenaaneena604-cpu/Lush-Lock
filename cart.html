@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shopping Cart | LushLocks</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    /* ----- RESET & BASE ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      background: #f6f3ed;
+      color: #1e2e24;
+      padding-top: 100px;
+      transition: padding-top 0.2s;
+    }
+
+    /* ===== FIXED NAVBAR (with toggle) ===== */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: #ffffff;
+      padding: 14px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      box-shadow: 0 4px 18px rgba(0, 20, 10, 0.06);
+      z-index: 1000;
+      transition: all 0.25s ease;
+      gap: 10px 12px;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 700;
+      color: #263d2b;
+      text-decoration: none;
+      letter-spacing: -0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .logo span { color: #6f8f6a; }
+    .logo i { color: #4b6e47; }
+
+    /* ----- toggle button (hamburger) ----- */
+    .nav-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      font-size: 28px;
+      color: #263d2b;
+      cursor: pointer;
+      padding: 4px 8px;
+      transition: 0.2s;
+      line-height: 1;
+    }
+    .nav-toggle:hover {
+      color: #4b6e47;
+      transform: scale(1.02);
+    }
+
+    /* right side wrapper — collapsible */
+    .navbar-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      transition: all 0.25s ease;
+    }
+
+    .nav-icons {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .nav-icons a {
+      position: relative;
+      color: #263d2b;
+      font-size: 22px;
+      text-decoration: none;
+      transition: 0.2s;
+      line-height: 1;
+    }
+    .nav-icons a:hover {
+      color: #4b6e47;
+      transform: translateY(-2px);
+    }
+    .nav-icons a.active-icon {
+      color: #4b6e47 !important;
+    }
+
+    .cart-count {
+      position: absolute;
+      top: -10px;
+      right: -12px;
+      background: #4b6e47;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      width: 20px;
+      height: 20px;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .back-btn {
+      text-decoration: none;
+      color: #1e2e24;
+      border: 1.5px solid #6f8f6a;
+      padding: 8px 18px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: 0.25s;
+      background: transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .back-btn:hover {
+      background: #4b6e47;
+      color: #fff;
+      border-color: #4b6e47;
+    }
+
+    /* ----- MAIN CONTAINER & CART ----- */
+    .container {
+      max-width: 1100px;
+      margin: 20px auto 0;
+      padding: 0 24px 30px;
+    }
+
+    h1 {
+      text-align: center;
+      font-weight: 500;
+      font-size: 2.2rem;
+      letter-spacing: -0.5px;
+      color: #1e2e24;
+      margin: 8px 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    h1 i { color: #4b6e47; font-size: 2rem; }
+
+    .cart-item {
+      background: #fff;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+      border: 1px solid #eeebe4;
+      flex-wrap: wrap;
+    }
+    .cart-item img {
+      width: 100px;
+      height: 120px;
+      object-fit: contain;
+    }
+    .product-info {
+      flex: 1;
+      min-width: 150px;
+    }
+    .product-info h3 {
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .price {
+      color: #3a6042;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
+    .quantity {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .quantity button {
+      width: 34px;
+      height: 34px;
+      border: none;
+      border-radius: 50%;
+      background: #ece8e2;
+      font-size: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .quantity button:hover {
+      background: #d6d0c6;
+    }
+    .quantity span {
+      font-weight: 700;
+      font-size: 1.2rem;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .item-total {
+      font-weight: 700;
+      color: #1e2e24;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    .remove {
+      background: transparent;
+      border: none;
+      color: #b34a4a;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: 0.2s;
+      padding: 6px 10px;
+    }
+    .remove:hover {
+      color: #a13131;
+      transform: scale(1.1);
+    }
+
+    /* summary */
+    .summary {
+      background: #fff;
+      padding: 28px 32px;
+      border-radius: 20px;
+      margin-top: 28px;
+      text-align: right;
+      border: 1px solid #eeebe4;
+    }
+    .summary h2 {
+      color: #3a6042;
+      font-size: 2rem;
+    }
+    .checkout {
+      margin-top: 16px;
+      padding: 14px 40px;
+      border: none;
+      border-radius: 40px;
+      background: #4b6e47;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 4px 12px rgba(65, 95, 65, 0.2);
+    }
+    .checkout:hover {
+      background: #3a5a3a;
+      transform: scale(0.97);
+    }
+
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      font-size: 1.4rem;
+      color: #4f5f4a;
+      background: #fcfaf7;
+      border-radius: 40px;
+    }
+    .empty i { font-size: 3rem; color: #bc8f8a; }
+    .empty a {
+      color: #4b6e47;
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 2px solid #aac09f;
+    }
+
+    /* ----- MODAL ----- */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.45);
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background: #fff;
+      width: 90%;
+      max-width: 500px;
+      padding: 32px 28px;
+      border-radius: 28px;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+    .modal-content h2 {
+      text-align: center;
+      color: #263d2b;
+      margin-bottom: 24px;
+    }
+    .close {
+      position: absolute;
+      top: 14px;
+      right: 22px;
+      font-size: 30px;
+      cursor: pointer;
+      color: #888;
+      transition: 0.2s;
+    }
+    .close:hover { color: #b34a4a; }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #1e2e24;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #ddd8d0;
+      border-radius: 14px;
+      font-size: 1rem;
+      background: #fcfaf7;
+      transition: 0.15s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #6f8f6a;
+      box-shadow: 0 0 0 3px rgba(75, 110, 71, 0.15);
+    }
+    .form-group textarea {
+      resize: vertical;
+      height: 80px;
+    }
+    .submit-order {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 40px;
+      background: #4b6e47;
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 6px;
+    }
+    .submit-order:hover {
+      background: #3a5a3a;
+    }
+
+    /* ----- FOOTER (simple) ----- */
+    .simple-footer {
+      width: 100%;
+      background: #263d2b;
+      color: #f0f3ec;
+      margin-top: 70px;
+      padding: 40px 6% 20px;
+    }
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 25px;
+    }
+    .footer-brand h2 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .footer-brand span { color: #b6d0aa; }
+    .footer-brand p {
+      color: #d4dfce;
+      margin-top: 6px;
+      font-size: 0.95rem;
+    }
+    .footer-menu {
+      display: flex;
+      gap: 22px;
+      flex-wrap: wrap;
+    }
+    .footer-menu a {
+      color: #eef3ea;
+      text-decoration: none;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+    .footer-menu a:hover { color: #c7dec0; }
+    .footer-social {
+      display: flex;
+      gap: 12px;
+    }
+    .footer-social a {
+      width: 42px;
+      height: 42px;
+      border-radius: 60px;
+      border: 1.5px solid #aac09f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #f0f3ec;
+      text-decoration: none;
+      transition: 0.2s;
+      font-size: 1.2rem;
+    }
+    .footer-social a:hover {
+      background: #aac09f;
+      color: #1e2e24;
+    }
+    .footer-line {
+      margin: 28px 0 16px;
+      border: 0;
+      border-top: 1.5px solid rgba(200, 215, 185, 0.25);
+    }
+    .footer-bottom {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #cfddc8;
+    }
+
+    /* =============================================
+       RESPONSIVE BREAKPOINTS (toggle + navbar)
+    ============================================= */
+
+    /* ----- tablet & smaller: show toggle, collapse menu ----- */
+    @media (max-width: 820px) {
+      .nav-toggle {
+        display: inline-block;
+        order: 2;
+      }
+      .navbar {
+        padding: 12px 5%;
+        flex-wrap: wrap;
+      }
+      .logo {
+        order: 1;
+        flex: 1;
+      }
+      .navbar-right {
+        order: 3;
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        max-height: 0;
+        overflow: hidden;
+        padding: 0 6px;
+        opacity: 0;
+        transition: max-height 0.35s ease, opacity 0.3s ease, padding 0.2s;
+        border-top: 0px solid transparent;
+        pointer-events: none;
+      }
+      .navbar-right.open {
+        max-height: 480px;
+        padding: 18px 6px 8px;
+        opacity: 1;
+        border-top: 1.5px solid #e2e8dd;
+        pointer-events: auto;
+      }
+      .nav-icons {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 22px 24px;
+        width: 100%;
+      }
+      .nav-icons a {
+        font-size: 26px;
+      }
+      .back-btn {
+        width: 100%;
+        max-width: 260px;
+        justify-content: center;
+        padding: 10px 16px;
+        font-size: 1rem;
+      }
+      body {
+        padding-top: 110px;
+      }
+      .container {
+        padding: 0 16px 20px;
+      }
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 28px;
+      }
+      .cart-item {
+        flex-direction: column;
+        text-align: center;
+        padding: 18px;
+      }
+      .cart-item img {
+        width: 130px;
+        height: auto;
+      }
+      .product-info {
+        width: 100%;
+      }
+      .quantity {
+        justify-content: center;
+      }
+      .item-total {
+        margin: 6px 0;
+      }
+      .summary {
+        text-align: center;
+      }
+      .footer-content {
+        flex-direction: column;
+        text-align: center;
+      }
+      .footer-menu {
+        justify-content: center;
+      }
+    }
+
+    /* ----- small phones ----- */
+    @media (max-width: 480px) {
+      body { padding-top: 120px; }
+      .navbar { padding: 10px 4%; }
+      .logo { font-size: 24px; }
+      .nav-toggle { font-size: 26px; }
+      .nav-icons a { font-size: 24px; }
+      .navbar-right.open { max-height: 520px; }
+
+      .cart-item {
+        padding: 14px;
+        gap: 12px;
+      }
+      .cart-item img {
+        width: 110px;
+        height: auto;
+      }
+      .price {
+        font-size: 1.1rem;
+      }
+      .quantity button {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+      }
+      .summary h2 {
+        font-size: 1.8rem;
+      }
+      .checkout {
+        width: 100%;
+        padding: 14px;
+      }
+      .modal-content {
+        padding: 22px 18px;
+      }
+    }
+
+    /* large screens: toggle hidden, menu always visible */
+    @media (min-width: 821px) {
+      .nav-toggle {
+        display: none !important;
+      }
+      .navbar-right {
+        display: flex !important;
+        max-height: none !important;
+        opacity: 1 !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        border-top: none !important;
+        pointer-events: auto !important;
+        flex-direction: row !important;
+        width: auto !important;
+      }
+      .nav-icons {
+        width: auto !important;
+        flex-wrap: nowrap !important;
+      }
+      .back-btn {
+        width: auto !important;
+        max-width: none !important;
+      }
+    }
+
+    /* helper */
+    .fa-heart, .fa-shopping-cart, .fa-trash { pointer-events: none; }
+  </style>
+</head>
+<body>
+
+  <!-- ============ NAVBAR with TOGGLE ============ -->
+  <nav class="navbar">
+    <a href="index.html" class="logo">
+      <i class="fas fa-leaf"></i> Lush<span>Locks</span>
+    </a>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="navbar-right" id="navbarRight">
+      <div class="nav-icons">
+        <a href="index.html" title="Home"><i class="fas fa-home"></i></a>
+        <a href="wishlist.html" title="Wishlist"><i class="fas fa-heart"></i></a>
+        <a href="cart.html" class="active-icon" title="Cart">
+          <i class="fas fa-shopping-cart"></i>
+          <span id="cartCount" class="cart-count">0</span>
+        </a>
+       
+      </div>
+
+      <a href="index.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Continue Shopping
+      </a>
+    </div>
+  </nav>
+
+  <!-- ============ MAIN CONTENT ============ -->
+  <div class="container">
+    <h1><i class="fas fa-shopping-bag"></i> My Cart</h1>
+    <div id="cartContainer"></div>
+    <div id="cartSummary" class="summary"></div>
+  </div>
+
+  <!-- ============ CHECKOUT MODAL ============ -->
+  <div id="checkoutModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeCheckout()">&times;</span>
+      <h2>Complete Your Order 🛍️</h2>
+      <form id="checkoutForm" onsubmit="submitOrder(event)">
+        <div class="form-group">
+          <label for="customerName">Full Name</label>
+          <input type="text" id="customerName" placeholder="Enter your name" required />
+        </div>
+        <div class="form-group">
+          <label for="address">Delivery Address</label>
+          <textarea id="address" placeholder="Enter your complete address" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" placeholder="Enter phone number" required />
+        </div>
+        <div class="form-group">
+          <label for="payment">Mode of Payment</label>
+          <select id="payment" required>
+            <option value="">Select Payment Method</option>
+            <option value="Cash on Delivery">Cash on Delivery</option>
+            <option value="UPI">UPI</option>
+            <option value="Card">Credit / Debit Card</option>
+          </select>
+        </div>
+        <button type="submit" class="submit-order">Submit Order</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="simple-footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h2><i class="fas fa-leaf"></i> Lush<span>Locks</span></h2>
+        <p>Natural care for beautiful, healthy hair.</p>
+      </div>
+      <div class="footer-menu">
+        <a href="index.html">Home</a>
+        <a href="wishlist.html">Wishlist</a>
+        <a href="cart.html">Cart</a>
+        <a href="index.html#contact">Contact</a>
+      </div>
+      <div class="footer-social">
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+    <hr class="footer-line" />
+    <div class="footer-bottom">© 2026 LushLocks | All Rights Reserved</div>
+  </footer>
+
+  <script>
+    (function() {
+      // ----- TOGGLE functionality -----
+      const toggleBtn = document.getElementById('navToggle');
+      const navbarRight = document.getElementById('navbarRight');
+
+      if (toggleBtn && navbarRight) {
+        toggleBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          navbarRight.classList.toggle('open');
+          const icon = toggleBtn.querySelector('i');
+          icon.className = navbarRight.classList.contains('open') ? 'fas fa-times' : 'fas fa-bars';
+        });
+
+        // close on outside click
+        document.addEventListener('click', function(e) {
+          const isInside = navbarRight.contains(e.target) || toggleBtn.contains(e.target);
+          if (!isInside && navbarRight.classList.contains('open')) {
+            navbarRight.classList.remove('open');
+            toggleBtn.querySelector('i').className = 'fas fa-bars';
+          }
+        });
+
+        // close on Escape
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && navbarRight.classList.contains('open')) {
+            navbarRight.classList.remove('open');
+            toggleBtn.querySelector('i').className = 'fas fa-bars';
+          }
+        });
+      }
+
+      // ----- CART FUNCTIONS -----
+      function getCart() {
+        return JSON.parse(localStorage.getItem('cart')) || [];
+      }
+
+      function setCart(cart) {
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        displayCart();
+      }
+
+      function updateCartCount() {
+        const cart = getCart();
+        const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+        const badge = document.getElementById('cartCount');
+        if (badge) badge.textContent = total;
+      }
+
+      // display cart
+      window.displayCart = function() {
+        const cart = getCart();
+        const container = document.getElementById('cartContainer');
+        const summary = document.getElementById('cartSummary');
+
+        if (cart.length === 0) {
+          container.innerHTML = `
+            <div class="empty">
+              <i class="fas fa-shopping-bag"></i><br><br>
+              Your cart is empty 🛒<br><br>
+              <a href="index.html">Continue Shopping</a>
+            </div>
+          `;
+          summary.innerHTML = '';
+          return;
+        }
+
+        let html = '';
+        let total = 0;
+
+        cart.forEach((product, index) => {
+          const itemTotal = product.price * product.quantity;
+          total += itemTotal;
+          const img = product.image || 'https://placehold.co/100x120/e8e0d8/3a5a3a?text=✨';
+          html += `
+            <div class="cart-item">
+              <img src="${img}" alt="${product.name}" loading="lazy" />
+              <div class="product-info">
+                <h3>${product.name}</h3>
+                <div class="price">₹${product.price}</div>
+                <div class="quantity">
+                  <button onclick="decreaseQuantity(${index})">−</button>
+                  <span>${product.quantity}</span>
+                  <button onclick="increaseQuantity(${index})">+</button>
+                </div>
+              </div>
+              <div class="item-total"><strong>₹${itemTotal}</strong></div>
+              <button class="remove" onclick="removeCart(${index})"><i class="fas fa-trash"></i></button>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+        summary.innerHTML = `
+          <h2>Total: ₹${total}</h2>
+          <button class="checkout" onclick="checkout()">Proceed to Checkout</button>
+        `;
+      };
+
+      // quantity controls
+      window.increaseQuantity = function(index) {
+        const cart = getCart();
+        if (cart[index]) {
+          cart[index].quantity += 1;
+          setCart(cart);
+        }
+      };
+
+      window.decreaseQuantity = function(index) {
+        const cart = getCart();
+        if (!cart[index]) return;
+        if (cart[index].quantity > 1) {
+          cart[index].quantity -= 1;
+        } else {
+          cart.splice(index, 1);
+        }
+        setCart(cart);
+      };
+
+      window.removeCart = function(index) {
+        const cart = getCart();
+        cart.splice(index, 1);
+        setCart(cart);
+      };
+
+      // checkout modal
+      window.checkout = function() {
+        const cart = getCart();
+        if (cart.length === 0) {
+          alert('Your cart is empty!');
+          return;
+        }
+        document.getElementById('checkoutModal').style.display = 'flex';
+      };
+
+      window.closeCheckout = function() {
+        document.getElementById('checkoutModal').style.display = 'none';
+      };
+
+      window.submitOrder = function(event) {
+        event.preventDefault();
+        const name = document.getElementById('customerName').value;
+        const payment = document.getElementById('payment').value;
+        const cart = getCart();
+
+        if (cart.length === 0) {
+          alert('Your cart is empty!');
+          return;
+        }
+
+        localStorage.removeItem('cart');
+        alert(`Order placed successfully! 🎉\n\nThank you, ${name} ❤️\n\nPayment: ${payment}`);
+        closeCheckout();
+        document.getElementById('checkoutForm').reset();
+        setCart([]);
+        displayCart();
+        updateCartCount();
+      };
+
+      // ----- seed data if empty -----
+      function seedCart() {
+        let cart = getCart();
+        if (cart.length === 0) {
+          const sample = [
+            { name: 'Coconut Oil Serum', price: 349, quantity: 1, image: 'https://placehold.co/100x120/e8e0d8/3a5a3a?text=🌴' },
+            { name: 'Argan Shampoo', price: 499, quantity: 2, image: 'https://placehold.co/100x120/e8e0d8/3a5a3a?text=🧴' },
+            { name: 'Aloe Vera Mask', price: 279, quantity: 1, image: 'https://placehold.co/100x120/e8e0d8/3a5a3a?text=🌿' }
+          ];
+          localStorage.setItem('cart', JSON.stringify(sample));
+        }
+      }
+
+      // ----- init -----
+      seedCart();
+      updateCartCount();
+      displayCart();
+
+      // sync across tabs
+      window.addEventListener('storage', function(e) {
+        if (e.key === 'cart') {
+          updateCartCount();
+          displayCart();
+        }
+      });
+
+    })();
+  </script>
+</body>
+</html>
