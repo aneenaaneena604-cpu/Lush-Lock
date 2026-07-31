@@ -465,6 +465,39 @@
         max-width: none !important;
       }
     }
+    .empty-wishlist{
+    text-align:center;
+    padding:80px 20px;
+}
+
+.empty-wishlist i{
+    font-size:70px;
+    color:#c94b4b;
+    margin-bottom:20px;
+}
+
+.empty-wishlist h2{
+    color:#2f4f2f;
+    margin-bottom:10px;
+}
+
+.empty-wishlist p{
+    color:#666;
+    margin-bottom:20px;
+}
+
+.shop-btn{
+    display:inline-block;
+    padding:12px 25px;
+    background:#4f7a4f;
+    color:#fff;
+    text-decoration:none;
+    border-radius:30px;
+}
+
+.shop-btn:hover{
+    background:#355c35;
+}
 
     /* small helper */
     .fa-heart, .fa-cart-shopping { pointer-events: none; }
@@ -533,170 +566,184 @@
   </footer>
 
   <script>
-    (function() {
-      // ----- TOGGLE functionality -----
-      const toggleBtn = document.getElementById('navToggle');
-      const navbarRight = document.getElementById('navbarRight');
+    (function () {
 
-      if (toggleBtn && navbarRight) {
-        toggleBtn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          navbarRight.classList.toggle('open');
-          // change icon
-          const icon = toggleBtn.querySelector('i');
-          if (navbarRight.classList.contains('open')) {
-            icon.className = 'fas fa-times';
-          } else {
-            icon.className = 'fas fa-bars';
-          }
-        });
+  // ----- TOGGLE functionality -----
+  const toggleBtn = document.getElementById("navToggle");
+  const navbarRight = document.getElementById("navbarRight");
 
-        // close on outside click (optional, improves UX)
-        document.addEventListener('click', function(e) {
-          const isClickInside = navbarRight.contains(e.target) || toggleBtn.contains(e.target);
-          if (!isClickInside && navbarRight.classList.contains('open')) {
-            navbarRight.classList.remove('open');
-            const icon = toggleBtn.querySelector('i');
-            icon.className = 'fas fa-bars';
-          }
-        });
+  if (toggleBtn && navbarRight) {
 
-        // close on escape key
-        document.addEventListener('keydown', function(e) {
-          if (e.key === 'Escape' && navbarRight.classList.contains('open')) {
-            navbarRight.classList.remove('open');
-            const icon = toggleBtn.querySelector('i');
-            icon.className = 'fas fa-bars';
-          }
-        });
+    toggleBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      navbarRight.classList.toggle("open");
+
+      const icon = toggleBtn.querySelector("i");
+      icon.className = navbarRight.classList.contains("open")
+        ? "fas fa-times"
+        : "fas fa-bars";
+    });
+
+    document.addEventListener("click", function (e) {
+      if (
+        !navbarRight.contains(e.target) &&
+        !toggleBtn.contains(e.target)
+      ) {
+        navbarRight.classList.remove("open");
+        toggleBtn.querySelector("i").className = "fas fa-bars";
       }
+    });
 
-      // ----- update cart badge -----
-      function updateCartBadge() {
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-        const badge = document.getElementById('cartCount');
-        if (badge) badge.textContent = total;
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") {
+        navbarRight.classList.remove("open");
+        toggleBtn.querySelector("i").className = "fas fa-bars";
       }
+    });
 
-      // ----- display wishlist -----
-      function displayWishlist() {
-        const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-        const container = document.getElementById('wishlistContainer');
-        if (!container) return;
+  }
 
-        if (wishlist.length === 0) {
-          container.innerHTML = `
-            <div class="empty">
-              <i class="far fa-heart"></i><br><br>
-              Your wishlist is empty ❤️
-            </div>
-          `;
-          return;
-        }
+  // ----- Cart Badge -----
+  function updateCartBadge() {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+    document.getElementById("cartCount").textContent = total;
+  }
 
-        let html = '';
-        wishlist.forEach((product, index) => {
-          const name = product.name || 'Product';
-          const price = product.price || '0';
-          const image = product.image || 'https://placehold.co/180x200/e8e0d8/3a5a3a?text=✨';
-          html += `
-            <div class="wishlist-card">
-              <img src="${image}" alt="${name}" loading="lazy" />
-              <h3>${name}</h3>
-              <div class="price">₹${price}</div>
-              <button class="btn cart-btn" onclick="moveToCart(${index})">
-                <i class="fas fa-cart-shopping"></i> Add to Cart
-              </button>
-              <button class="btn remove-btn" onclick="removeWishlist(${index})">
-                <i class="fas fa-trash"></i> Remove
-              </button>
-            </div>
-          `;
-        });
-        container.innerHTML = html;
-        updateCartBadge();
-      }
+  // ----- Display Wishlist -----
+  function displayWishlist() {
 
-      // ----- remove from wishlist -----
-      window.removeWishlist = function(index) {
-        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-        if (index >= 0 && index < wishlist.length) {
-          wishlist.splice(index, 1);
-          localStorage.setItem('wishlist', JSON.stringify(wishlist));
-          displayWishlist();
-          updateCartBadge();
-        }
-      };
+    const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+    const container = document.getElementById("wishlistContainer");
 
-      // ----- move to cart -----
-window.moveToCart = function(index) {
+    if (wishlist.length === 0) {
+
+      container.innerHTML = `
+        <div class="empty-wishlist">
+            <i class="fa-solid fa-heart-crack"></i>
+            <h2>Your Wishlist is Empty</h2>
+            <p>Add your favourite products to the wishlist.</p>
+           
+        </div>
+      `;
+
+      updateCartBadge();
+      return;
+    }
+
+    let html = "";
+
+    wishlist.forEach((product, index) => {
+
+      html += `
+      <div class="wishlist-card">
+
+          <img src="${product.image}" alt="${product.name}">
+
+          <h3>${product.name}</h3>
+
+          <div class="price">₹${product.price}</div>
+
+          <button class="btn cart-btn"
+            onclick="moveToCart(${index})">
+            <i class="fas fa-cart-shopping"></i>
+            Add to Cart
+          </button>
+
+          <button class="btn remove-btn"
+            onclick="removeWishlist(${index})">
+            <i class="fas fa-trash"></i>
+            Remove
+          </button>
+
+      </div>
+      `;
+    });
+
+    container.innerHTML = html;
+
+    updateCartBadge();
+
+  }
+
+  // ----- Remove Wishlist -----
+  window.removeWishlist = function (index) {
 
     let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
-    if (index < 0 || index >= wishlist.length) return;
+    wishlist.splice(index, 1);
+
+    localStorage.setItem("wishlist", JSON.stringify(wishlist));
+
+    displayWishlist();
+
+  };
+
+  // ----- Move To Cart -----
+  window.moveToCart = function (index) {
+
+    let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
     let product = wishlist[index];
-
-    // Cart
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
     let existing = cart.find(item => item.name === product.name);
 
     if (existing) {
-        existing.quantity = (existing.quantity || 1) + 1;
+
+      existing.quantity = (existing.quantity || 1) + 1;
+
     } else {
-        cart.push({
-            name: product.name,
-            price: product.price,
-            image: product.image,
-            quantity: 1
-        });
+
+      cart.push({
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        quantity: 1
+      });
+
     }
 
-    // Save cart
     localStorage.setItem("cart", JSON.stringify(cart));
 
-    // Remove from wishlist
     wishlist.splice(index, 1);
+
     localStorage.setItem("wishlist", JSON.stringify(wishlist));
 
-    // Refresh page
     displayWishlist();
+
+    alert("🛒 Product moved to Cart!");
+
+  };
+
+  // ----- Page Load -----
+  document.addEventListener("DOMContentLoaded", function () {
+
+    if (!localStorage.getItem("wishlist")) {
+      localStorage.setItem("wishlist", JSON.stringify([]));
+    }
+
+    if (!localStorage.getItem("cart")) {
+      localStorage.setItem("cart", JSON.stringify([]));
+    }
+
+    displayWishlist();
+
     updateCartBadge();
 
-    alert("🛒 Product moved to cart!");
-}
+  });
 
-      // ----- seed data (if empty) -----
-      document.addEventListener('DOMContentLoaded', function() {
-        let wishlist = JSON.parse(localStorage.getItem('wishlist'));
-        if (!wishlist || wishlist.length === 0) {
-          const sample = [
-            { name: 'Coconut Oil Serum', price: '349', image: 'https://placehold.co/180x200/e8e0d8/3a5a3a?text=🌴' },
-            { name: 'Argan Shampoo', price: '499', image: 'https://placehold.co/180x200/e8e0d8/3a5a3a?text=🧴' },
-            { name: 'Aloe Vera Mask', price: '279', image: 'https://placehold.co/180x200/e8e0d8/3a5a3a?text=🌿' },
-            { name: 'Keratin Conditioner', price: '599', image: 'https://placehold.co/180x200/e8e0d8/3a5a3a?text=✨' }
-          ];
-          localStorage.setItem('wishlist', JSON.stringify(sample));
-        }
-        if (!JSON.parse(localStorage.getItem('cart'))) {
-          localStorage.setItem('cart', JSON.stringify([]));
-        }
-        displayWishlist();
-        updateCartBadge();
-      });
+  // ----- Sync -----
+  window.addEventListener("storage", function () {
 
-      // sync across tabs
-      window.addEventListener('storage', function(e) {
-        if (e.key === 'cart' || e.key === 'wishlist') {
-          updateCartBadge();
-          if (e.key === 'wishlist') displayWishlist();
-        }
-      });
+    displayWishlist();
 
-    })();
+    updateCartBadge();
 
+  });
+
+})();
   </script>
 </body>
 </html>
