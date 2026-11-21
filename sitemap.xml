@@ -1,26 +1,13 @@
 
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-    <!-- Home Page -->
-    <url>
-        <loc>https://aneenaaneena604-cpu.github.io/Lush-Lock/</loc>
-        <changefreq>weekly</changefreq>
-        <priority>1.0</priority>
-    </url>
-
-    <!-- Cart Page -->
-    <url>
-        <loc>https://aneenaaneena604-cpu.github.io/Lush-Lock/cart.html</loc>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-    </url>
-
-    <!-- Wishlist Page -->
-    <url>
-        <loc>https://aneenaaneena604-cpu.github.io/Lush-Lock/wishlist.html</loc>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-    </url>
-
+  <url>
+    <loc>https://aneenaaneena604-cpu.github.io/Lush-Lock/</loc>
+  </url>
+  <url>
+    <loc>https://aneenaaneena604-cpu.github.io/Lush-Lock/cart.html</loc>
+  </url>
+  <url>
+    <loc>https://aneenaaneena604-cpu.github.io/Lush-Lock/wishlist.html</loc>
+  </url>
 </urlset>
