@@ -12,7 +12,28 @@
 
   gtag('config', 'G-7Z26S20VBG');
 </script>
+<script>
+// Lush Lock Ecommerce Tracking
 
+function trackAddToCart(productName, price) {
+  gtag('event', 'add_to_cart', {
+    currency: 'INR',
+    value: price,
+    items: [{
+      item_name: productName,
+      price: price,
+      quantity: 1
+    }]
+  });
+}
+
+function trackBeginCheckout(total) {
+  gtag('event', 'begin_checkout', {
+    currency: 'INR',
+    value: total
+  });
+}
+</script>
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
